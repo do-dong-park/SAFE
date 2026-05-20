@@ -1,0 +1,16 @@
+defaults:
+  - base_groot_n16
+
+subset_name: robocasa_seen4_unseen2_openDrawer_pnpCab_100ep
+data_path_prefix: ""
+data_path: /home/dongkyu/pdk_ws/temporal_vla/outputs/eval/robocasa/groot_n16/safe_split_seen4_unseen2_openDrawer_pnpCab_100ep
+
+# This split is physically materialized as train / val_seen / val_unseen.
+# The loader preserves those directories instead of re-randomizing task splits.
+unseen_task_ratio: 0.25
+seen_train_ratio: 0.75
+
+# SAFE paper-style pi0 aggregation default for flow-matching features.
+diff_idx_rel: mean
+horizon_idx_rel: mean
+

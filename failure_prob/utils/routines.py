@@ -165,20 +165,21 @@ def eval_model_and_log(
         )
         to_be_logged[f"classify_fixed_thresh/{method_name}"] = wandb.Table(dataframe=df)
 
-        # Split Conformal Prediction: val_seen for calibration, val_unseen for testing
-        split_cp_logs = eval_split_conformal(
-            rollouts_by_split_name, scores_by_split_name, method_name,
-            calib_split_names=["val_seen"], test_split_names=["val_unseen"]
-        )
-        split_cp_logs = pd.DataFrame(split_cp_logs)
-        to_be_logged[f"classify_cp_maxsofar/{method_name}"] = wandb.Table(dataframe=split_cp_logs)
-        
-        # Functional Conformal Prediction
-        df, cp_bands_by_alpha = eval_functional_conformal(
-            rollouts_by_split_name, scores_by_split_name, method_name,
-            calib_split_names=["val_seen"], test_split_names=["val_unseen"]
-        )
-        to_be_logged[f"classify_cp_functional/{method_name}"] = wandb.Table(dataframe=df)
+        # Split/functional conformal metrics need a held-out test split. Seen-only
+        # GR00T runs deliberately omit val_unseen, so skip these tables there.
+        if "val_seen" in rollouts_by_split_name and "val_unseen" in rollouts_by_split_name:
+            split_cp_logs = eval_split_conformal(
+                rollouts_by_split_name, scores_by_split_name, method_name,
+                calib_split_names=["val_seen"], test_split_names=["val_unseen"]
+            )
+            split_cp_logs = pd.DataFrame(split_cp_logs)
+            to_be_logged[f"classify_cp_maxsofar/{method_name}"] = wandb.Table(dataframe=split_cp_logs)
+            
+            df, cp_bands_by_alpha = eval_functional_conformal(
+                rollouts_by_split_name, scores_by_split_name, method_name,
+                calib_split_names=["val_seen"], test_split_names=["val_unseen"]
+            )
+            to_be_logged[f"classify_cp_functional/{method_name}"] = wandb.Table(dataframe=df)
         
         # Compute the classification metrics vs. detection time, by varying thresholds
         df, logs = eval_perf_det_time_curves(
@@ -221,7 +222,7 @@ def eval_perf_det_time_curves(
     ax.set_xlabel("Mean detection time of GT failure")
     ax.set_ylabel(y_key)
     fig.tight_layout()
-    logs[f"perf_vs_det/{method_name}_{y_key}_vs_Tdet"] = fig
+    logs[f"perf_vs_det/{method_name}_{y_key}_vs_Tdet"] = wandb.Image(fig)
     plt.close(fig)
 
     dfs = pd.concat(dfs)

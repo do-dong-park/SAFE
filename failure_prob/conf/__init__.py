@@ -56,6 +56,48 @@ class OpenvlaDatasetConfig(DatasetConfig):
     token_idx_rel: float | str = 1.0
     
     
+@dataclass
+class GrootN15DatasetConfig(DatasetConfig):
+    name: str = "groot_n15"
+    unseen_task_ratio: float = 0.3
+    seen_train_ratio: float = 0.6
+    pred_horizon: int = 1
+    exec_horizon: int = 8
+
+    # GR00T exports token features plus attention masks. Use a mask-aware pool
+    # by default so image/text padding tokens do not affect SAFE features.
+    feature_pool: float | str = "masked_mean"
+    action_keys: tuple[str, ...] = (
+        "action.end_effector_position",
+        "action.end_effector_rotation",
+        "action.gripper_close",
+        "action.base_motion",
+        "action.control_mode",
+    )
+
+    
+
+@dataclass
+class GrootN16DatasetConfig(DatasetConfig):
+    name: str = "groot_n16"
+    unseen_task_ratio: float = 0.25
+    seen_train_ratio: float = 0.75
+    pred_horizon: int = 16
+    exec_horizon: int = 16
+
+    # GR00T N1.6 exports flow-matching action-token features with axes
+    # [denoising_step, valid_action_step, feature_dim]. Aggregate these
+    # two axes at load time into one SAFE feature vector per policy step.
+    diff_idx_rel: float | str = "mean"
+    horizon_idx_rel: float | str = "mean"
+    action_keys: tuple[str, ...] = (
+        "action.end_effector_position",
+        "action.end_effector_rotation",
+        "action.gripper_close",
+        "action.base_motion",
+        "action.control_mode",
+    )
+
 
 @dataclass
 class OpenPizeroDatasetConfig(DatasetConfig):
@@ -292,6 +334,8 @@ cs.store(name="base_config", node=Config)
 
 # Register dataset variants into the "dataset" config group.
 cs.store(group="dataset", name="base_openvla", node=OpenvlaDatasetConfig)
+cs.store(group="dataset", name="base_groot_n15", node=GrootN15DatasetConfig)
+cs.store(group="dataset", name="base_groot_n16", node=GrootN16DatasetConfig)
 cs.store(group="dataset", name="base_open_pizero", node=OpenPizeroDatasetConfig)
 cs.store(group="dataset", name="base_pizero_fast", node=PizeroFastDatasetConfig)
 cs.store(group="dataset", name="base_pizero", node=PizeroDatasetConfig)

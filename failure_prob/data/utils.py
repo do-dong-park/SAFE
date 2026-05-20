@@ -247,7 +247,7 @@ def pad_rollout_batch(
             batch_size, max_length, action_dim,
             dtype=dtype, device=device
         )
-        for r in rollouts:
+        for i, r in enumerate(rollouts):
             seq_length = r.action_vectors.shape[0]
             action_vectors[i, :seq_length] = r.action_vectors.to(device)
 
@@ -400,4 +400,3 @@ def process_tensor_idx_rel(A, command):
     else:
         raise ValueError(f"Unknown token index: {command}")
     
-

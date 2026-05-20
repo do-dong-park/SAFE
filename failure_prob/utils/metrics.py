@@ -124,7 +124,7 @@ def eval_scores_roc_prc(
         # Plot the score curves
         fig, axes = plot_scores_by_splits(scores_by_split_name, rollouts_by_split_name, individual=True)
         fig.suptitle(method_name)
-        to_be_logged[f"failure_scores/{method_name}_indiv"] = fig
+        to_be_logged[f"failure_scores/{method_name}_indiv"] = wandb.Image(fig)
         plt.close(fig)
         
         fig, axes = plot_scores_by_splits(scores_by_split_name, rollouts_by_split_name, individual=False)
@@ -155,11 +155,11 @@ def eval_scores_roc_prc(
     # Plot the curves
     if plot_auc_curves:
         fig = plot_roc_curves(roc_curves_data, method_name)
-        to_be_logged[f"roc_curve/{method_name}"] = fig
+        to_be_logged[f"roc_curve/{method_name}"] = wandb.Image(fig)
         plt.close(fig)
         
         fig = plot_prc_curves(prc_curves_data, method_name)
-        to_be_logged[f"prc_curve/{method_name}"] = fig
+        to_be_logged[f"prc_curve/{method_name}"] = wandb.Image(fig)
         plt.close(fig)
         
 
@@ -240,19 +240,19 @@ def eval_scores_roc_prc(
     # Plot the curves
     if plot_auc_curves:
         fig = plot_roc_curves(roc_curves_data_early, method_name)
-        to_be_logged[f"falert_early_roc_curve/{method_name}"] = fig
+        to_be_logged[f"falert_early_roc_curve/{method_name}"] = wandb.Image(fig)
         plt.close(fig)
         
         fig = plot_prc_curves(prc_curves_data_early, method_name)
-        to_be_logged[f"falert_early_prc_curve/{method_name}"] = fig
+        to_be_logged[f"falert_early_prc_curve/{method_name}"] = wandb.Image(fig)
         plt.close(fig)
         
         fig = plot_roc_curves(roc_curves_data_end, method_name)
-        to_be_logged[f"falert_end_roc_curve/{method_name}"] = fig
+        to_be_logged[f"falert_end_roc_curve/{method_name}"] = wandb.Image(fig)
         plt.close(fig)
 
         fig = plot_prc_curves(prc_curves_data_end, method_name)
-        to_be_logged[f"falert_end_prc_curve/{method_name}"] = fig
+        to_be_logged[f"falert_end_prc_curve/{method_name}"] = wandb.Image(fig)
         plt.close(fig)
         
         
@@ -748,7 +748,6 @@ def eval_det_time_vs_classification(rollouts: list, scores: list[np.ndarray], la
         })
     
     return results
-
 
 
 
